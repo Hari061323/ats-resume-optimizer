@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered ATS Resume Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-item {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .status-active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #f44336;
+            color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #eef0ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragging {
+            background: #e0e5ff;
+            border-color: #4a5dea;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .btn-dark {
+            background: #343a40;
+            color: white;
+        }
+
+        .btn-dark:hover:not(:disabled) {
+            background: #23272b;
+        }
+
+        /* Intelligent Analysis Styles */
+        .intelligent-analysis {
+            padding: 20px;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .overall-score {
+            text-align: center;
+        }
+
+        .score-number {
+            display: block;
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .analysis-sections {
+            display: grid;
+            gap: 20px;
+        }
+
+        .analysis-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .dimensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .dimension-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .dimension-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .dimension-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .relevance-score {
+            text-align: center;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .relevance-score .score {
+            display: block;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .insights-list, .recommendations-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insights-list li, .recommendations-list li {
+            background: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        /* Analytics Styles */
+        .analytics-dashboard {
+            padding: 20px;
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .system-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 100px;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .analytics-sections {
+            display: grid;
+            gap: 20px;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .user-stat {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .score-distribution {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .distribution-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .range {
+            font-weight: bold;
+        }
+
+        .count {
+            background: #17a2b8;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .improvement-areas {
+            list-style: none;
+            padding: 0;
+        }
+
+        .improvement-areas li {
+            background: #fff3cd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-grade {
+            font-size: 2em;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .score-label {
+            color: #666;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .keyword-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            margin: 3px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .missing-keyword {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .metric-card {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .swot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .swot-box {
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+
+        .swot-strengths { background: #e8f5e9; }
+        .swot-weaknesses { background: #ffebee; }
+        .swot-opportunities { background: #e3f2fd; }
+        .swot-threats { background: #fff3e0; }
+
+        .swot-box h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .swot-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .swot-box li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .swot-box li::before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .job-card {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .job-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .job-card.selected {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .job-match-score {
+            float: right;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AI-Powered ATS Resume Optimizer</h1>
+            <p class="subtitle">Boost your resume's ATS score with intelligent AI enhancement</p>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-item" id="apiStatus">API: Checking...</span>
+            <span class="status-item" id="jobsStatus">Jobs: Loading...</span>
+            <span class="status-item" id="aiStatus">AI: Checking...</span>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Column: Input Section -->
+            <div class="card">
+                <h2>📄 Resume Input</h2>
+                
+                <!-- Instructions -->
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px;">📌 How to Use:</h4>
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li>Select a job from the list below</li>
+                        <li>Upload your resume (PDF, DOCX, TXT)</li>
+                        <li>Click "Analyze Resume" to get your ATS score</li>
+                        <li>Use "Enhance Resume" to improve your score</li>
+                    </ol>
+                </div>
+                
+                <!-- Selected Job Indicator -->
+                <div id="selectedJobIndicator" style="display: none; padding: 15px; background: #e8f5e9; border-radius: 8px; margin-bottom: 20px; border: 2px solid #4caf50;">
+                    <strong>✅ Job Selected:</strong> <span id="selectedJobText"></span>
+                </div>
+                
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p><strong>Click to upload or drag and drop</strong></p>
+                    <p>Supported: PDF, DOCX, DOC, TXT</p>
+                    <input type="file" id="resumeFile" accept=".pdf,.docx,.doc,.txt">
+                </div>
+
+                <div id="fileInfo" style="display: none; margin-bottom: 20px; padding: 10px; background: #f0f8ff; border-radius: 8px;">
+                    <strong>📎 Selected File:</strong> <span id="fileName"></span>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="enhancementLevel">Enhancement Level:</label>
+                        <select id="enhancementLevel">
+                            <option value="minimal">Minimal - Light touch-ups</option>
+                            <option value="moderate" selected>Moderate - Balanced</option>
+                            <option value="aggressive">Aggressive - Major rewrite</option>
+                            <option value="complete">Complete - Full AI rewrite</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="targetScore">Target Score:</label>
+                        <select id="targetScore">
+                            <option value="75">75+ (Good)</option>
+                            <option value="85" selected>85+ (Excellent)</option>
+                            <option value="95">95+ (Perfect)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="analyzeBtn" disabled>🔍 Analyze Resume</button>
+                    <button class="btn btn-secondary" id="enhanceBtn" disabled>✨ Enhance Resume</button>
+                    <button class="btn btn-success" id="intelligentBtn" disabled>🧠 Intelligent Analysis</button>
+                    <button class="btn btn-warning" id="matchJobsBtn" disabled>🎯 Match All Jobs</button>
+                    <button class="btn btn-info" id="feedbackBtn" disabled>💡 Get Feedback</button>
+                    <button class="btn btn-dark" id="analyticsBtn" disabled>📊 View Analytics</button>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Processing your resume...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results Section -->
+            <div class="card results" id="resultsSection">
+                <h2>📊 Analysis Results</h2>
+
+                <div class="score-display">
+                    <div class="score-number" id="scoreNumber">0</div>
+                    <div class="score-grade" id="scoreGrade">-</div>
+                    <div class="score-label" id="scoreLabel">ATS Score</div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="overview">Overview</button>
+                    <button class="tab" data-tab="keywords">Keywords</button>
+                    <button class="tab" data-tab="swot">SWOT</button>
+                    <button class="tab" data-tab="improvements">Improvements</button>
+                    <button class="tab" data-tab="matches">Job Matches</button>
+                    <button class="tab" data-tab="intelligent">🧠 Intelligent</button>
+                    <button class="tab" data-tab="analytics">📊 Analytics</button>
+                </div>
+
+                <div class="tab-content active" id="overview">
+                    <h3>Scoring Breakdown</h3>
+                    <div id="scoringBreakdown"></div>
+
+                    <h3 style="margin-top: 20px;">AI Insights</h3>
+                    <div id="aiInsights"></div>
+
+                    <h3 style="margin-top: 20px;">Pass Probability</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="passProbability" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="keywords">
+                    <h3>Matched Keywords</h3>
+                    <div id="matchedKeywords"></div>
+
+                    <h3 style="margin-top: 20px;">Missing Keywords</h3>
+                    <div id="missingKeywords"></div>
+
+                    <h3 style="margin-top: 20px;">Recommendations</h3>
+                    <div id="keywordRecommendations"></div>
+                </div>
+
+                <div class="tab-content" id="swot">
+                    <div class="swot-grid" id="swotGrid"></div>
+                </div>
+
+                <div class="tab-content" id="improvements">
+                    <h3>Improvement Roadmap</h3>
+                    <div id="improvementRoadmap"></div>
+
+                    <h3 style="margin-top: 20px;">Enhanced Bullets</h3>
+                    <div id="enhancedBullets"></div>
+                </div>
+
+                <div class="tab-content" id="matches">
+                    <h3>Best Job Matches</h3>
+                    <div id="jobMatches"></div>
+                </div>
+
+                <div class="tab-content" id="intelligent">
+                    <h3>🧠 Intelligent Analysis Results</h3>
+                    <div id="intelligentResults"></div>
+                </div>
+
+                <div class="tab-content" id="analytics">
+                    <h3>📊 Analytics Dashboard</h3>
+                    <div id="analyticsResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Section -->
+        <div class="card">
+            <h2>💼 Available Jobs - Click to Select</h2>
+            <div class="controls" style="margin-bottom: 20px;">
+                <div class="control-group">
+                    <label for="jobFilter">Filter by Category:</label>
+                    <select id="jobFilter">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="jobLocation">Filter by Location:</label>
+                    <select id="jobLocation">
+                        <option value="all">All Locations</option>
+                    </select>
+                </div>
+            </div>
+            <div id="jobsCount" style="margin-bottom: 10px; color: #666;"></div>
+            <div id="jobsList"></div>
+        </div>
+
+        <footer>
+            <p>© 2024 AI ATS Resume Optimizer | Powered by GPT</p>
+        </footer>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_URL = 'http://127.0.0.1:8000';
+        
+        // Global variables
+        let selectedFile = null;
+        let selectedJob = null;
+        let availableJobs = [];
+        let apiConnected = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initializing ATS Resume Optimizer...');
+            checkSystemStatus();
+            setupEventListeners();
+            loadJobs();
+        });
+
+        // Check system status
+        async function checkSystemStatus() {
+            // Check API connection
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('apiStatus').textContent = 'API: Connected';
+                    document.getElementById('apiStatus').classList.add('status-active');
+                    apiConnected = true;
+                    
+                    // Check AI status
+                    const apiInfo = await fetch(`${API_URL}/`).then(r => r.json());
+                    const aiReady = apiInfo.ai_status && Object.values(apiInfo.ai_status).every(v => v);
+                    
+                    if (aiReady) {
+                        document.getElementById('aiStatus').textContent = 'AI: Ready';
+                        document.getElementById('aiStatus').classList.add('status-active');
+                    } else {
+                        document.getElementById('aiStatus').textContent = 'AI: Not Configured';
+                        document.getElementById('aiStatus').classList.add('status-inactive');
+                        showError('AI components not configured. Please add OpenAI API key to .env file');
+                    }
+                }
+            } catch (error) {
+                console.error('API connection error:', error);
+                document.getElementById('apiStatus').textContent = 'API: Disconnected';
+                document.getElementById('apiStatus').classList.add('status-inactive');
+                document.getElementById('aiStatus').textContent = 'AI: Unavailable';
+                document.getElementById('aiStatus').classList.add('status-inactive');
+                showError('Cannot connect to API. Please start the backend server: cd backend && python app.py');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // File upload
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('resumeFile');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragging');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragging');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragging');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            // Action buttons
+            document.getElementById('analyzeBtn').addEventListener('click', analyzeResume);
+            document.getElementById('enhanceBtn').addEventListener('click', enhanceResume);
+            document.getElementById('intelligentBtn').addEventListener('click', intelligentAnalysis);
+            document.getElementById('matchJobsBtn').addEventListener('click', matchJobs);
+            document.getElementById('feedbackBtn').addEventListener('click', getFeedback);
+            document.getElementById('analyticsBtn').addEventListener('click', viewAnalytics);
+
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.getAttribute('data-tab');
+                    switchTab(targetTab);
+                });
+            });
+
+            // Filters
+            document.getElementById('jobFilter').addEventListener('change', filterJobs);
+            document.getElementById('jobLocation').addEventListener('change', filterJobs);
+        }
+
+        // File handling
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                               'application/msword', 'text/plain'];
+            
+            if (!validTypes.includes(file.type)) {
+                showError('Please upload a valid file (PDF, DOCX, DOC, or TXT)');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').style.display = 'block';
+            showSuccess(`File "${file.name}" selected successfully`);
+            updateButtonStates();
+        }
+
+        // Update button states
+        function updateButtonStates() {
+            const hasFile = selectedFile !== null;
+            const hasJob = selectedJob !== null;
+            const isConnected = apiConnected;
+            
+            document.getElementById('analyzeBtn').disabled = !(hasFile && hasJob && isConnected);
+            document.getElementById('enhanceBtn').disabled = !(hasFile && hasJob && isConnected);
+            document.getElementById('intelligentBtn').disabled = !(hasFile && hasJob && isConnected);
+            document.getElementById('matchJobsBtn').disabled = !(hasFile && isConnected);
+            document.getElementById('feedbackBtn').disabled = !(hasFile && hasJob && isConnected);
+            document.getElementById('analyticsBtn').disabled = !isConnected;
+        }
+
+        // Load jobs
+        async function loadJobs() {
+            try {
+                console.log('Loading jobs from API...');
+                const response = await fetch(`${API_URL}/jobs`);
+                const data = await response.json();
+                
+                if (data.jobs && data.jobs.length > 0) {
+                    availableJobs = data.jobs;
+                    console.log(`Loaded ${availableJobs.length} jobs`);
+                    
+                    // Update status
+                    document.getElementById('jobsStatus').textContent = `Jobs: ${availableJobs.length} loaded`;
+                    document.getElementById('jobsStatus').classList.add('status-active');
+                    document.getElementById('jobsCount').textContent = `Showing ${availableJobs.length} jobs`;
+                    
+                    // Populate filters
+                    populateFilters(data);
+                    
+                    // Display jobs
+                    displayJobsList(availableJobs);
+                    
+                    showSuccess(`Loaded ${availableJobs.length} jobs from database`);
+                } else {
+                    console.log('No jobs found in response');
+                    document.getElementById('jobsStatus').textContent = 'Jobs: None found';
+                    document.getElementById('jobsStatus').classList.add('status-inactive');
+                    showError('No jobs found. Please check sample_jobs.json file');
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                document.getElementById('jobsStatus').textContent = 'Jobs: Failed to load';
+                document.getElementById('jobsStatus').classList.add('status-inactive');
+                showError('Failed to load jobs. Check if backend is running.');
+            }
+        }
+
+        // Populate filter dropdowns
+        function populateFilters(data) {
+            // Category filter
+            const categoryFilter = document.getElementById('jobFilter');
+            if (data.categories) {
+                data.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilter.appendChild(option);
+                });
+            }
+            
+            // Location filter
+            const locationFilter = document.getElementById('jobLocation');
+            if (data.locations) {
+                data.locations.forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    locationFilter.appendChild(option);
+                });
+            }
+        }
+
+        // Filter jobs
+        function filterJobs() {
+            const category = document.getElementById('jobFilter').value;
+            const location = document.getElementById('jobLocation').value;
+            
+            let filtered = availableJobs;
+            
+            if (category !== 'all') {
+                filtered = filtered.filter(job => job.category === category);
+            }
+            
+            if (location !== 'all') {
+                filtered = filtered.filter(job => job.location === location);
+            }
+            
+            document.getElementById('jobsCount').textContent = `Showing ${filtered.length} of ${availableJobs.length} jobs`;
+            displayJobsList(filtered);
+        }
+
+        // Display jobs list
+        function displayJobsList(jobs) {
+            if (!jobs || jobs.length === 0) {
+                document.getElementById('jobsList').innerHTML = '<p style="color: #666;">No jobs available</p>';
+                return;
+            }
+
+            const jobsHtml = jobs.map(job => `
+                <div class="job-card ${selectedJob && selectedJob.id === job.id ? 'selected' : ''}" 
+                     onclick="selectJob(${job.id})" id="job-${job.id}">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="color: #333; margin-bottom: 5px;">${job.title}</h4>
+                            <p style="color: #666; margin: 5px 0;"><strong>${job.company}</strong> - ${job.location}</p>
+                            <p style="color: #888; font-size: 0.9em;">${job.type} | ${job.experience_level}</p>
+                            <p style="color: #667eea; font-weight: bold;">${job.salary_range}</p>
+                        </div>
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9em;">
+                            ${selectedJob && selectedJob.id === job.id ? '✓ Selected' : 'Select'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('jobsList').innerHTML = jobsHtml;
+        }
+
+        // Select job
+        function selectJob(jobId) {
+            const job = availableJobs.find(j => j.id === jobId);
+            if (job) {
+                // Remove previous selection
+                document.querySelectorAll('.job-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Update selected job
+                selectedJob = job;
+                document.getElementById(`job-${jobId}`).classList.add('selected');
+                
+                // Show selected job indicator
+                document.getElementById('selectedJobIndicator').style.display = 'block';
+                document.getElementById('selectedJobText').textContent = `${job.title} at ${job.company}`;
+                
+                // Update button states
+                updateButtonStates();
+                
+                showSuccess(`Selected: "${job.title}" at ${job.company}. You can now analyze your resume!`);
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // API Functions
+        async function analyzeResume() {
+            if (!selectedFile || !selectedJob) {
+                showError('Please select both a job and upload a resume');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            formData.append('jobDescription', selectedJob.description);
+
+            showLoading(true);
+            hideMessages();
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                displayResults(data);
+                showSuccess(`Resume analyzed successfully! ATS Score: ${Math.round(data.score)}`);
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Analysis failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function enhanceResume() {
+            if (!selectedFile || !selectedJob) {
+                showError('Please select both a job and upload a resume');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            formData.append('jobDescription', selectedJob.description);
+            formData.append('enhancementLevel', document.getElementById('enhancementLevel').value);
+            formData.append('targetScore', document.getElementById('targetScore').value);
+
+            showLoading(true);
+            hideMessages();
+
+            try {
+                const response = await fetch(`${API_URL}/enhance`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                displayEnhancementResults(data);
+                showSuccess('Resume enhanced successfully! New score: ' + Math.round(data.new_score));
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Enhancement failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function matchJobs() {
+            if (!selectedFile) {
+                showError('Please upload a resume first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            
+            if (availableJobs && availableJobs.length > 0) {
+                formData.append('jobListings', JSON.stringify(availableJobs));
+            }
+
+            showLoading(true);
+            hideMessages();
+
+            try {
+                const response = await fetch(`${API_URL}/match-jobs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                displayJobMatches(data);
+                switchTab('matches');
+                showSuccess(`Analyzed against ${data.total_jobs_analyzed} jobs!`);
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Job matching failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function getFeedback() {
+            if (!selectedFile || !selectedJob) {
+                showError('Please select both a job and upload a resume');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            formData.append('jobDescription', selectedJob.description);
+
+            showLoading(true);
+            hideMessages();
+
+            try {
+                const response = await fetch(`${API_URL}/feedback`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                displayFeedback(data.feedback);
+                showSuccess('Feedback generated successfully!');
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Feedback generation failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display Functions
+        function displayResults(data) {
+            document.getElementById('resultsSection').classList.add('show');
+            
+            // Score display
+            document.getElementById('scoreNumber').textContent = Math.round(data.score);
+            document.getElementById('scoreGrade').textContent = `Grade: ${data.grade}`;
+            document.getElementById('scoreLabel').textContent = `ATS Score for ${selectedJob.title}`;
+            
+            // Scoring breakdown
+            const breakdownHtml = Object.entries(data.scoring_breakdown || {}).map(([key, value]) => `
+                <div class="metric-card">
+                    <div class="metric-label">${formatLabel(key)}</div>
+                    <div class="metric-value">${Math.round(value)}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${value}%">${Math.round(value)}%</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('scoringBreakdown').innerHTML = breakdownHtml || '<p>No breakdown available</p>';
+
+            // AI Insights
+            if (data.insights) {
+                const insightsHtml = `
+                    <div class="metric-card">
+                        <h4>Main Strength</h4>
+                        <p>${data.insights.main_strength || 'Analyzing...'}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Critical Weakness</h4>
+                        <p>${data.insights.critical_weakness || 'Analyzing...'}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Quick Win</h4>
+                        <p>${data.insights.quick_win || 'Add more keywords'}</p>
+                    </div>
+                `;
+                document.getElementById('aiInsights').innerHTML = insightsHtml;
+            }
+
+            // Pass probability
+            const probability = data.pass_probability || 'Medium';
+            const probValue = probability.includes('Very High') ? 90 : 
+                             probability.includes('High') ? 70 : 
+                             probability.includes('Medium') ? 50 : 30;
+            document.getElementById('passProbability').style.width = `${probValue}%`;
+            document.getElementById('passProbability').textContent = probability;
+
+            // Keywords
+            displayKeywords(data.keywords);
+
+            // SWOT Analysis
+            displaySWOT(data.swot);
+
+            // Improvements
+            displayImprovements(data.improvements);
+        }
+
+        function displayKeywords(keywords) {
+            if (!keywords) return;
+            
+            // Matched keywords
+            const matchedHtml = (keywords.matched || []).map(kw => 
+                `<span class="keyword-badge">${kw}</span>`
+            ).join('') || '<p>No exact matches found</p>';
+            document.getElementById('matchedKeywords').innerHTML = matchedHtml;
+
+            // Missing keywords
+            const missingHtml = (keywords.missing || []).map(kw => 
+                `<span class="keyword-badge missing-keyword">${kw}</span>`
+            ).join('') || '<p>No critical keywords missing!</p>';
+            document.getElementById('missingKeywords').innerHTML = missingHtml;
+
+            // Recommendations
+            document.getElementById('keywordRecommendations').innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-label">Keyword Match Rate</div>
+                    <div class="metric-value">${keywords.match_percentage || 0}%</div>
+                </div>
+            `;
+        }
+
+        function displaySWOT(swot) {
+            if (!swot) return;
+            
+            const swotHtml = `
+                <div class="swot-box swot-strengths">
+                    <h4>Strengths</h4>
+                    <ul>${(swot.strengths || []).map(s => `<li>${s}</li>`).join('') || '<li>None identified</li>'}</ul>
+                </div>
+                <div class="swot-box swot-weaknesses">
+                    <h4>Weaknesses</h4>
+                    <ul>${(swot.weaknesses || []).map(w => `<li>${w}</li>`).join('') || '<li>None identified</li>'}</ul>
+                </div>
+                <div class="swot-box swot-opportunities">
+                    <h4>Opportunities</h4>
+                    <ul>${(swot.opportunities || []).map(o => `<li>${o}</li>`).join('') || '<li>None identified</li>'}</ul>
+                </div>
+                <div class="swot-box swot-threats">
+                    <h4>Threats</h4>
+                    <ul>${(swot.threats || []).map(t => `<li>${t}</li>`).join('') || '<li>None identified</li>'}</ul>
+                </div>
+            `;
+            document.getElementById('swotGrid').innerHTML = swotHtml;
+        }
+
+        function displayImprovements(improvements) {
+            if (!improvements || improvements.length === 0) {
+                document.getElementById('improvementRoadmap').innerHTML = '<p>No improvements needed!</p>';
+                return;
+            }
+
+            const improvementsHtml = improvements.map(imp => `
+                <div class="metric-card">
+                    <h4>${formatLabel(imp.component)} - ${imp.priority} Priority</h4>
+                    <p>Current: ${Math.round(imp.current_score)}% → Target: ${imp.target_score}%</p>
+                    <ul>
+                        ${imp.actions.map(action => `<li>${action}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+            
+            document.getElementById('improvementRoadmap').innerHTML = improvementsHtml;
+        }
+
+        function displayEnhancementResults(data) {
+            document.getElementById('resultsSection').classList.add('show');
+            
+            // Update score
+            document.getElementById('scoreNumber').textContent = Math.round(data.new_score);
+            document.getElementById('scoreGrade').textContent = 'Enhanced!';
+            
+            // Show improvements
+            const improvementsHtml = (data.improvements_applied || []).map(imp => 
+                `<div class="metric-card">${imp}</div>`
+            ).join('') || '<p>Enhancements applied</p>';
+            document.getElementById('enhancedBullets').innerHTML = improvementsHtml;
+            
+            // Add download button if available
+            if (data.download_path) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn btn-success';
+                downloadBtn.innerHTML = '📥 Download Enhanced Resume';
+                downloadBtn.onclick = () => downloadEnhancedResume(data.download_path);
+                
+                // Add to action buttons area
+                const actionButtons = document.querySelector('.action-buttons');
+                if (actionButtons && !document.getElementById('downloadBtn')) {
+                    downloadBtn.id = 'downloadBtn';
+                    actionButtons.appendChild(downloadBtn);
+                }
+            }
+            
+            switchTab('improvements');
+        }
+        
+        function downloadEnhancedResume(downloadPath) {
+            try {
+                const link = document.createElement('a');
+                link.href = `${API_URL}${downloadPath}`;
+                link.download = '';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showSuccess('Enhanced resume downloaded successfully!');
+            } catch (error) {
+                console.error('Download error:', error);
+                showError('Failed to download enhanced resume');
+            }
+        }
+
+        async function intelligentAnalysis() {
+            if (!selectedFile || !selectedJob) {
+                showError('Please select both a job and upload a resume');
+                return;
+            }
+
+            showLoading('Running intelligent analysis with GPT-4.1...');
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            formData.append('job_description', selectedJob.description);
+            formData.append('job_title', selectedJob.title);
+            formData.append('company', selectedJob.company);
+
+            try {
+                const response = await fetch(`${API_URL}/intelligent-analysis`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                displayIntelligentResults(data);
+                switchTab('intelligent');
+                showSuccess('Intelligent analysis completed successfully!');
+            } catch (error) {
+                console.error('Error:', error);
+                hideLoading();
+                showError('Failed to run intelligent analysis. Please try again.');
+            }
+        }
+
+        async function viewAnalytics() {
+            showLoading('Loading analytics dashboard...');
+
+            try {
+                // Get system analytics
+                const systemResponse = await fetch(`${API_URL}/analytics/system`);
+                const systemData = await systemResponse.json();
+
+                // Get user analytics (using a default user ID for demo)
+                const userResponse = await fetch(`${API_URL}/analytics/dashboard/user_123`);
+                const userData = await userResponse.json();
+
+                hideLoading();
+
+                if (systemData.error || userData.error) {
+                    showError('Failed to load analytics data');
+                    return;
+                }
+
+                displayAnalytics(systemData.data, userData.data);
+                switchTab('analytics');
+                showSuccess('Analytics loaded successfully!');
+            } catch (error) {
+                console.error('Error:', error);
+                hideLoading();
+                showError('Failed to load analytics. Please try again.');
+            }
+        }
+
+        function displayJobMatches(data) {
+            if (!data.matches || data.matches.length === 0) {
+                document.getElementById('jobMatches').innerHTML = '<p>No matches found</p>';
+                return;
+            }
+
+            const matchesHtml = data.matches.map(match => {
+                const scoreColor = match.match_score >= 80 ? '#2e7d32' : 
+                                 match.match_score >= 60 ? '#f57c00' : '#c62828';
+                
+                return `
+                <div class="job-card" style="border-left-color: ${scoreColor};">
+                    <div class="job-match-score" style="color: ${scoreColor};">${Math.round(match.match_score)}%</div>
+                    <h4>${match.job_title}</h4>
+                    <p><strong>${match.company}</strong> - ${match.location}</p>
+                    <p>Grade: <strong>${match.grade}</strong> | Keywords: ${match.keyword_match}%</p>
+                    <p><strong>Fit:</strong> ${match.fit_analysis.overall_fit}</p>
+                </div>
+            `}).join('');
+            
+            document.getElementById('jobMatches').innerHTML = matchesHtml;
+        }
+
+        function displayFeedback(feedback) {
+            const feedbackHtml = `
+                <div class="metric-card">
+                    <h3>Overall Assessment</h3>
+                    <p>${feedback.overall}</p>
+                    
+                    <h4 style="margin-top: 15px;">Strengths:</h4>
+                    <ul>${feedback.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+                    
+                    <h4 style="margin-top: 15px;">Areas for Improvement:</h4>
+                    <ul>${feedback.areas_for_improvement.map(a => `<li>${a}</li>`).join('')}</ul>
+                    
+                    <h4 style="margin-top: 15px;">Action Items:</h4>
+                    <ul>${feedback.action_items.map(a => `<li>${a}</li>`).join('')}</ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Time to Improve:</strong> ${feedback.estimated_time_to_improve}</p>
+                    <p><strong>Priority:</strong> ${feedback.priority}</p>
+                </div>
+            `;
+            
+            document.getElementById('improvementRoadmap').innerHTML = feedbackHtml;
+            document.getElementById('resultsSection').classList.add('show');
+            switchTab('improvements');
+        }
+
+        // Utility Functions
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('show', show);
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(() => successEl.classList.remove('show'), 3000);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function formatLabel(key) {
+            return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function displayIntelligentResults(data) {
+            const resultsHtml = `
+                <div class="intelligent-analysis">
+                    <div class="analysis-header">
+                        <h4>🧠 GPT-4.1 Comprehensive Analysis</h4>
+                        <div class="overall-score">
+                            <span class="score-number">${Math.round(data.overall_score || 0)}</span>
+                            <span class="score-label">Overall Score</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-sections">
+                        <div class="analysis-section">
+                            <h5>📊 7-Dimensional Analysis</h5>
+                            <div class="dimensions-grid">
+                                ${Object.entries(data.dimensional_scores || {}).map(([dimension, score]) => `
+                                    <div class="dimension-card">
+                                        <div class="dimension-name">${dimension.replace(/_/g, ' ').toUpperCase()}</div>
+                                        <div class="dimension-score">${score}%</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5>🎯 Job Relevance Analysis</h5>
+                            <div class="relevance-score">
+                                <span class="score">${data.job_relevance_score || 0}%</span>
+                                <p>${data.job_relevance_analysis || 'Analysis not available'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5>💡 Key Insights</h5>
+                            <ul class="insights-list">
+                                ${(data.key_insights || []).map(insight => `<li>${insight}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5>🚀 Recommendations</h5>
+                            <ul class="recommendations-list">
+                                ${(data.recommendations || []).map(rec => `<li>${rec}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5>📈 Industry Insights</h5>
+                            <p>${data.industry_insights || 'Industry insights not available'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('intelligentResults').innerHTML = resultsHtml;
+        }
+
+        function displayAnalytics(systemData, userData) {
+            const analyticsHtml = `
+                <div class="analytics-dashboard">
+                    <div class="analytics-header">
+                        <h4>📊 Analytics Dashboard</h4>
+                        <div class="system-stats">
+                            <div class="stat-card">
+                                <div class="stat-number">${systemData.total_users || 0}</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">${systemData.total_analyses || 0}</div>
+                                <div class="stat-label">Total Analyses</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">${systemData.average_score || 0}</div>
+                                <div class="stat-label">Avg Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-sections">
+                        <div class="analytics-section">
+                            <h5>👤 User Analytics</h5>
+                            <div class="user-stats">
+                                <div class="user-stat">
+                                    <strong>User ID:</strong> ${userData.user_id || 'N/A'}
+                                </div>
+                                <div class="user-stat">
+                                    <strong>Total Analyses:</strong> ${userData.total_analyses || 0}
+                                </div>
+                                <div class="user-stat">
+                                    <strong>Latest Score:</strong> ${userData.latest_score || 0}
+                                </div>
+                                <div class="user-stat">
+                                    <strong>Score Trend:</strong> ${userData.score_trend || 'No data'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-section">
+                            <h5>📈 Score Distribution</h5>
+                            <div class="score-distribution">
+                                ${Object.entries(systemData.score_distribution || {}).map(([range, count]) => `
+                                    <div class="distribution-item">
+                                        <span class="range">${range}</span>
+                                        <span class="count">${count}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-section">
+                            <h5>🎯 Improvement Areas</h5>
+                            <ul class="improvement-areas">
+                                ${(userData.improvement_areas || []).map(area => `<li>${area}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('analyticsResults').innerHTML = analyticsHtml;
+        }
+    </script>
+</body>
+</html>
