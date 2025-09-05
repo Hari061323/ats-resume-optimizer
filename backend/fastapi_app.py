@@ -34,6 +34,15 @@ from ai_intelligent_resume_checker import IntelligentResumeChecker
 from analytics_dashboard import AnalyticsDashboard
 from analytics_endpoints import analytics_router
 
+# Import advanced AI modules
+from ai_advanced_resume_analyzer import AdvancedResumeAnalyzer
+from ai_advanced_resume_enhancer import AdvancedResumeEnhancer
+from ai_advanced_ats_scorer import AdvancedATSScorer
+from ai_industry_analyzer import IndustryAnalyzer
+from ai_multi_model_client import MultiModelAIClient
+from job_market_integrator import JobMarketIntegrator
+from ai_comprehensive_system import ComprehensiveAISystem
+
 
 # Configure logging
 import os
@@ -101,14 +110,34 @@ try:
     ats_scorer = AIATSScorer()
     resume_enhancer = AIResumeEnhancer()
     document_generator = AIDocumentGenerator()
-    logger.info("All AI components initialized successfully")
+    logger.info("Basic AI components initialized successfully")
 except Exception as e:
-    logger.error(f"Failed to initialize AI components: {str(e)}")
+    logger.error(f"Failed to initialize basic AI components: {str(e)}")
     resume_parser = None
     keyword_analyzer = None
     ats_scorer = None
     resume_enhancer = None
     document_generator = None
+
+# Initialize Advanced AI components
+try:
+    advanced_analyzer = AdvancedResumeAnalyzer()
+    advanced_enhancer = AdvancedResumeEnhancer()
+    advanced_ats_scorer = AdvancedATSScorer()
+    industry_analyzer = IndustryAnalyzer()
+    multi_model_client = MultiModelAIClient()
+    job_market_integrator = JobMarketIntegrator()
+    comprehensive_system = ComprehensiveAISystem()
+    logger.info("Advanced AI components initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize advanced AI components: {str(e)}")
+    advanced_analyzer = None
+    advanced_enhancer = None
+    advanced_ats_scorer = None
+    industry_analyzer = None
+    multi_model_client = None
+    job_market_integrator = None
+    comprehensive_system = None
 
 # Pydantic models
 class BulletImprovementRequest(BaseModel):
@@ -183,14 +212,32 @@ async def home():
             'match_jobs': '/match-jobs - Job matching',
             'improve_bullets': '/improve-bullets - Bullet enhancement',
             'jobs': '/jobs - Get sample jobs',
-            'docs': '/docs - API documentation'
+            'docs': '/docs - API documentation',
+            'advanced_analysis': '/advanced-analysis - Advanced AI analysis',
+            'advanced_enhancement': '/advanced-enhancement - Advanced AI enhancement',
+            'comprehensive_analysis': '/comprehensive-analysis - Comprehensive analysis',
+            'industry_analysis': '/industry-analysis - Industry-specific analysis',
+            'market_insights': '/market-insights - Real-time market data'
         },
         'ai_status': {
-            'parser': resume_parser is not None,
-            'analyzer': keyword_analyzer is not None,
-            'scorer': ats_scorer is not None,
-            'enhancer': resume_enhancer is not None,
-            'generator': document_generator is not None
+            'basic_components': {
+                'parser': resume_parser is not None,
+                'analyzer': keyword_analyzer is not None,
+                'scorer': ats_scorer is not None,
+                'enhancer': resume_enhancer is not None,
+                'generator': document_generator is not None,
+                'intelligent_checker': intelligent_checker is not None,
+                'analytics': analytics_dashboard is not None
+            },
+            'advanced_components': {
+                'advanced_analyzer': advanced_analyzer is not None,
+                'advanced_enhancer': advanced_enhancer is not None,
+                'advanced_ats_scorer': advanced_ats_scorer is not None,
+                'industry_analyzer': industry_analyzer is not None,
+                'multi_model_client': multi_model_client is not None,
+                'job_market_integrator': job_market_integrator is not None,
+                'comprehensive_system': comprehensive_system is not None
+            }
         }
     }
 
@@ -718,6 +765,260 @@ async def not_found_handler(request, exc):
         status_code=404,
         content={"error": "Endpoint not found"}
     )
+
+# Advanced AI Endpoints
+@app.post("/advanced-analysis", tags=["Advanced Analysis"])
+async def advanced_resume_analysis(
+    resume: UploadFile = File(...),
+    jobDescription: str = Form(...),
+    industry: str = Form("technology"),
+    roleLevel: str = Form("mid"),
+    _: None = Depends(check_ai_components)
+):
+    """Advanced resume analysis with cutting-edge AI techniques"""
+    try:
+        if not advanced_analyzer:
+            raise HTTPException(status_code=503, detail="Advanced analyzer not available")
+        
+        # Save uploaded file
+        filename = f"advanced_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{resume.filename}"
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        
+        with open(filepath, "wb") as buffer:
+            content = await resume.read()
+            buffer.write(content)
+        
+        # Parse resume
+        resume_text = resume_parser.extract_text(filepath)
+        if not resume_text:
+            raise HTTPException(status_code=400, detail="Could not extract text from resume")
+        
+        resume_data = resume_parser.parse_with_ai(resume_text)
+        
+        # Run advanced analysis
+        analysis_results = await advanced_analyzer.analyze_resume_comprehensive(
+            resume_data, jobDescription, industry
+        )
+        
+        # Clean up uploaded file
+        try:
+            os.remove(filepath)
+        except:
+            pass
+        
+        return {
+            'success': True,
+            'analysis_results': analysis_results,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in advanced analysis: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/advanced-enhancement", tags=["Advanced Enhancement"])
+async def advanced_resume_enhancement(
+    resume: UploadFile = File(...),
+    jobDescription: str = Form(...),
+    industry: str = Form("technology"),
+    roleLevel: str = Form("mid"),
+    enhancementLevel: str = Form("moderate"),
+    _: None = Depends(check_ai_components)
+):
+    """Advanced resume enhancement with AI-powered techniques"""
+    try:
+        if not advanced_enhancer:
+            raise HTTPException(status_code=503, detail="Advanced enhancer not available")
+        
+        # Save uploaded file
+        filename = f"enhanced_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{resume.filename}"
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        
+        with open(filepath, "wb") as buffer:
+            content = await resume.read()
+            buffer.write(content)
+        
+        # Parse resume
+        resume_text = resume_parser.extract_text(filepath)
+        if not resume_text:
+            raise HTTPException(status_code=400, detail="Could not extract text from resume")
+        
+        resume_data = resume_parser.parse_with_ai(resume_text)
+        
+        # Run advanced enhancement
+        enhancement_result = await advanced_enhancer.enhance_resume_advanced(
+            resume_data, jobDescription, industry, enhancementLevel
+        )
+        
+        # Generate enhanced document
+        enhanced_doc = document_generator.generate_docx(enhancement_result.enhanced_resume)
+        output_filename = f"enhanced_{filename.replace('.pdf', '').replace('.docx', '')}.docx"
+        output_path = os.path.join(UPLOAD_FOLDER, output_filename)
+        
+        with open(output_path, "wb") as f:
+            f.write(enhanced_doc.getvalue())
+        
+        # Clean up uploaded file
+        try:
+            os.remove(filepath)
+        except:
+            pass
+        
+        return {
+            'success': True,
+            'enhanced_resume': enhancement_result.enhanced_resume,
+            'enhancement_report': enhancement_result.enhancement_report,
+            'improvement_score': enhancement_result.improvement_score,
+            'changes_made': enhancement_result.changes_made,
+            'ai_insights': enhancement_result.ai_insights,
+            'download_path': f"/download/{output_filename}",
+            'timestamp': datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in advanced enhancement: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/comprehensive-analysis", tags=["Comprehensive Analysis"])
+async def comprehensive_resume_analysis(
+    resume: UploadFile = File(...),
+    jobDescription: str = Form(...),
+    industry: str = Form("technology"),
+    roleLevel: str = Form("mid"),
+    enhancementLevel: str = Form("moderate"),
+    _: None = Depends(check_ai_components)
+):
+    """Comprehensive resume analysis with all AI systems"""
+    try:
+        if not comprehensive_system:
+            raise HTTPException(status_code=503, detail="Comprehensive system not available")
+        
+        # Save uploaded file
+        filename = f"comprehensive_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{resume.filename}"
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        
+        with open(filepath, "wb") as buffer:
+            content = await resume.read()
+            buffer.write(content)
+        
+        # Parse resume
+        resume_text = resume_parser.extract_text(filepath)
+        if not resume_text:
+            raise HTTPException(status_code=400, detail="Could not extract text from resume")
+        
+        resume_data = resume_parser.parse_with_ai(resume_text)
+        
+        # Run comprehensive analysis
+        analysis_results = await comprehensive_system.analyze_resume_comprehensive(
+            resume_data, jobDescription, industry, roleLevel, enhancementLevel
+        )
+        
+        # Clean up uploaded file
+        try:
+            os.remove(filepath)
+        except:
+            pass
+        
+        return {
+            'success': True,
+            'comprehensive_analysis': {
+                'overall_score': analysis_results.overall_score,
+                'improvement_potential': analysis_results.improvement_potential,
+                'next_steps': analysis_results.next_steps
+            },
+            'resume_analysis': analysis_results.resume_analysis,
+            'ats_scoring': analysis_results.ats_scoring,
+            'industry_analysis': analysis_results.industry_analysis,
+            'market_insights': analysis_results.market_insights,
+            'multi_model_consensus': analysis_results.multi_model_consensus,
+            'enhancement_suggestions': analysis_results.enhancement_suggestions,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in comprehensive analysis: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/industry-analysis", tags=["Industry Analysis"])
+async def industry_resume_analysis(
+    resume: UploadFile = File(...),
+    jobDescription: str = Form(...),
+    industry: str = Form("technology"),
+    roleLevel: str = Form("mid"),
+    _: None = Depends(check_ai_components)
+):
+    """Industry-specific resume analysis"""
+    try:
+        if not industry_analyzer:
+            raise HTTPException(status_code=503, detail="Industry analyzer not available")
+        
+        # Save uploaded file
+        filename = f"industry_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{resume.filename}"
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        
+        with open(filepath, "wb") as buffer:
+            content = await resume.read()
+            buffer.write(content)
+        
+        # Parse resume
+        resume_text = resume_parser.extract_text(filepath)
+        if not resume_text:
+            raise HTTPException(status_code=400, detail="Could not extract text from resume")
+        
+        resume_data = resume_parser.parse_with_ai(resume_text)
+        
+        # Run industry analysis
+        industry_results = industry_analyzer.analyze_industry_fit(
+            resume_data, jobDescription, industry, roleLevel
+        )
+        
+        # Clean up uploaded file
+        try:
+            os.remove(filepath)
+        except:
+            pass
+        
+        return {
+            'success': True,
+            'industry_analysis': industry_results,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in industry analysis: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/market-insights", tags=["Market Insights"])
+async def get_market_insights(
+    jobTitle: str,
+    location: str = "United States",
+    industry: str = "technology"
+):
+    """Get real-time job market insights"""
+    try:
+        if not job_market_integrator:
+            raise HTTPException(status_code=503, detail="Job market integrator not available")
+        
+        # Get market insights
+        insights = await job_market_integrator.get_market_insights(jobTitle, location, industry)
+        
+        return {
+            'success': True,
+            'market_insights': insights,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting market insights: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
